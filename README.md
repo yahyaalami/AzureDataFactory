@@ -87,7 +87,8 @@ Les **datasets** représentent les données manipulées dans le pipeline.
 
 📷 **Exemple avancé : plusieurs activités de copie dans un pipeline**
 
-![Exemple avancé avec plusieurs Copy Activities](screenshots/Capture d'écran 2025-04-08 155519.png)
+![Exemple avancé avec plusieurs Copy Activities] ![Capture d'écran 2025-04-08 155519](https://github.com/user-attachments/assets/7224d473-1a1b-4e64-96ee-e935d1152c63)
+
 
 ---
 
@@ -108,7 +109,8 @@ Les **datasets** représentent les données manipulées dans le pipeline.
 sql
 SELECT * FROM Cars;
 
-![Résultat d'importation dans SQL](screenshots/Capture d'écran 2025-04-08 155642.png)
+![Résultat d'importation dans SQL] ![Capture d'écran 2025-04-08 155642](https://github.com/user-attachments/assets/01173014-ce23-4cdb-8a01-38b294fb57e0)
+
 
 
 
