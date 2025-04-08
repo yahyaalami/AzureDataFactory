@@ -1,28 +1,45 @@
-### Objectif du Projet
-Créer un pipeline dans Azure Data Factory qui copie les données depuis un fichier 
-CSV (dans Azure Blob Storage) vers une table dans Azure SQL Database.
+# 📊 Azure Data Factory – ETL de fichier CSV vers Azure SQL Database
 
-## 🧱 Étapes du projet :
+Ce projet montre comment configurer un pipeline ETL simple avec **Azure Data Factory (ADF)** pour transférer des données depuis un fichier CSV stocké dans **Azure Blob Storage** vers une table dans **Azure SQL Database**, le tout via l'interface graphique d'Azure sans écrire de code.
 
-# ✅ Étape 1 – Créer le service Azure Data Factory :
+---
 
-Aller dans le portail Azure.
-Cliquer sur "Create a Resource", chercher Data Factory.
-Remplir les champs :
-  Nom de la Data Factory
-  Subscription
-  Resource Group
-  Région
-Lancer la création.
-Une fois déployée, cliquer sur "Author & Monitor" pour ouvrir l’interface de création de pipelines.
+## 🧭 Objectif
 
+Créer un pipeline dans ADF qui :
+- Extrait des données à partir d’un fichier CSV dans Azure Blob Storage
+- Les charge dans une table relationnelle `Cars` dans Azure SQL
+- Le tout en utilisant **Linked Services**, **Datasets** et une **Copy Activity**
 
-# ✅ Étape 2 – Préparer les ressources de stockage et base de données :
+---
 
-Uploader le fichier cars.csv dans un container Azure Blob Storage.
-Créer une table Cars dans Azure SQL Database avec cette structure :
- 
-  CREATE TABLE Cars (
+## 📌 Vue d’ensemble du pipeline
+
+![Diagramme complet du pipeline](screenshots/Capture d'écran 2025-04-08 155448.png)
+
+Ce diagramme illustre l’architecture globale du pipeline :
+- Source : Blob Storage contenant `Cars.csv`
+- Activité de copie orchestrée par ADF
+- Destination : table `Cars` dans Azure SQL
+
+---
+
+## 🧱 Étapes du projet
+
+### 1. Création du service Azure Data Factory
+
+- Crée une ressource ADF depuis le portail Azure
+- Remplis les champs : nom, groupe de ressources, région
+- Clique sur **Author & Monitor** pour accéder à l'interface graphique
+
+---
+
+### 2. Préparation des données sources et cibles
+
+- Téléverse le fichier `cars.csv` dans un conteneur Azure Blob Storage
+- Crée la table cible dans Azure SQL Database avec ce script :
+sql
+CREATE TABLE Cars (
   Make NVARCHAR(50),
   Model NVARCHAR(50),
   Type NVARCHAR(50),
@@ -31,86 +48,106 @@ Créer une table Cars dans Azure SQL Database avec cette structure :
   Length FLOAT
 );
 
-S’assurer que le firewall du serveur SQL autorise les connexions de services Azure (sinon le pipeline échouera).
+
+### 3. 🔗 Création des Linked Services
+
+Les **Linked Services** sont des connexions sécurisées vers les sources et destinations de données.
+
+- 🔐 Crée un Linked Service vers **Azure Blob Storage**
+  - Méthode d’authentification : Account Key ou SAS Token
+- 🔐 Crée un Linked Service vers **Azure SQL Database**
+  - Méthode d’authentification : SQL Login (utilisateur + mot de passe)
+  - Assure-toi que le firewall du serveur SQL autorise les services Azure
+
+---
+
+### 4. 📦 Définition des Datasets
+
+Les **datasets** représentent les données manipulées dans le pipeline.
+
+- Dataset source :
+  - Type : Azure Blob Storage – DelimitedText (CSV)
+  - Fichier : `cars.csv`
+  - Option cochée : *First row as header*
+- Dataset destination :
+  - Type : Azure SQL Database
+  - Table cible : `Cars`
+
+---
+
+### 5. 🛠️ Création du pipeline et configuration de la Copy Activity
+
+- Crée un **pipeline** (nommé par ex. `CopyCarsPipeline`)
+- Ajoute une **Copy Data Activity**
+- Sélectionne :
+  - Le dataset source (`cars.csv`)
+  - Le dataset cible (`Cars`)
+- Va dans l’onglet **Mapping** pour vérifier que les colonnes sont bien mappées (automatiquement ou manuellement)
+
+📷 **Exemple avancé : plusieurs activités de copie dans un pipeline**
+
+![Exemple avancé avec plusieurs Copy Activities](screenshots/Capture d'écran 2025-04-08 155519.png)
+
+---
+
+### 6. ▶️ Exécution et suivi du pipeline
+
+- Lance un **Debug** dans l’interface d’ADF
+- Ouvre l’onglet **Monitor** pour :
+  - Suivre l’état d’exécution
+  - Vérifier que l’activité est bien en *Success*
+  - Obtenir le nombre de lignes transférées
+
+---
+
+### 7. 🧾 Vérification des données dans Azure SQL Database
+
+- Connecte-toi à ton Azure SQL Database
+- Exécute la requête suivante pour voir les données importées :
+sql
+SELECT * FROM Cars;
+
+![Résultat d'importation dans SQL](screenshots/Capture d'écran 2025-04-08 155642.png)
 
 
 
-# ✅ Étape 3 – Créer les Linked Services :
+### 🧠 Résultat attendu
 
-Les connexions vers les sources/destinations de données.
-Aller dans l’onglet Manage > Linked services.
-Créer un Linked Service pour :
-  Azure Blob Storage (avec account key ou SAS token)
-  Azure SQL Database (avec login/mot de passe SQL)
+📷 **Diagramme illustrant l’architecture complète du pipeline :**
 
+![Pipeline complet : CSV → SQL](screenshots/Capture d'écran 2025-04-08 155448.png)
 
-# ✅ Étape 4 – Créer les Datasets : 
-Représentation des données sources et cibles.
-1- Dataset source (CSV dans Blob Storage):
-Type : Azure Blob Storage > DelimitedText
-Sélectionner le fichier cars.csv
-Cocher "First row as header"
-Lier au Linked Service Blob Storage
+Ce projet aboutit à un pipeline fonctionnel dans Azure Data Factory capable de :
 
-2- Dataset cible (table dans Azure SQL):
-Type : Azure SQL Database
-Sélectionner la table Cars
-Lier au Linked Service SQL
+- Lire un fichier CSV (`cars.csv`) stocké dans Azure Blob Storage
+- Copier automatiquement les données dans une table (`Cars`) d’une base de données Azure SQL
+- Gérer l’ensemble du processus sans avoir besoin d’écrire une seule ligne de code
 
+Ce pipeline peut ensuite être :
+- Exécuté à la demande
+- Programmé pour s'exécuter automatiquement
+- Étendu pour d'autres types de données ou destinations
 
-# ✅ Étape 5 – Créer la pipeline :
+---
 
-Aller dans l’onglet Author > Pipelines > "New pipeline".
-Donner un nom à la pipeline : ex. CopyCarsPipeline.
+### 🚀 Améliorations possibles
 
+Voici quelques idées pour enrichir ce projet de base :
 
-# ✅ Étape 6 – Ajouter une Copy Data Activity :
-L’élément central du pipeline.
+- 🔄 **Automatisation** : ajouter des triggers pour exécuter le pipeline à des intervalles réguliers (quotidien, horaire...) ou à l'arrivée d'un nouveau fichier
+- 🧪 **Ajout de transformations** : intégrer des **Mapping Data Flows** pour transformer les données pendant leur transit
+- 📁 **Multi-fichiers** : configurer le pipeline pour traiter plusieurs fichiers CSV à la fois via des wildcards ou un paramétrage dynamique
+- 🧩 **Modularité** : paramétrer le pipeline pour le rendre réutilisable avec différents noms de fichiers, schémas ou destinations
 
-Faire glisser une Copy Data activity dans le canevas.
-Dans les propriétés :
-  Source : sélectionner le dataset Blob (CSV)
-  Sink : sélectionner le dataset SQL
-Dans l’onglet Mapping :
-  Vérifier que les colonnes sont bien mappées automatiquement (sinon le faire manuellement).
+---
 
+### 🙏 Crédit
 
-# ✅ Étape 7 – Exécuter le pipeline :
-Cliquer sur Debug pour tester immédiatement.
-Aller dans l’onglet Monitor pour voir l’état d’exécution.
-Vérifier que l’activité est marquée comme Success.
+Ce tutoriel est **inspiré** du travail de la chaîne YouTube :
 
-# ✅ Étape 8 – Vérifier les données dans la base SQL :
-Ouvrir le portail SQL ou utiliser Azure Query Editor.
-Lancer : SELECT * FROM Cars;
-Vérifier que les lignes du fichier cars.csv ont bien été insérées dans la table.
+🎥 [Adam Marczak – Azure for Everyone](https://www.youtube.com/@AdamMarczak)  
+📺 Vidéo originale : [Azure Data Factory Tutorial – ETL Made Easy](https://www.youtube.com/watch?v=EpDkxTHAhOs)
 
+L'objectif ici est pédagogique : reproduire et adapter le projet à des fins d’apprentissage.
 
-
-
-## 🧠 Résultat :
-✔ Le pipeline fonctionne. À chaque exécution :
-  Il lit le fichier cars.csv dans Azure Blob.
-  Il copie les données dans la table Cars de Azure SQL DB.
-  Le tout sans écrire une seule ligne de code, via l’interface graphique d’ADF.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+---
