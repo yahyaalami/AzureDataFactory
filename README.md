@@ -15,7 +15,8 @@ Créer un pipeline dans ADF qui :
 
 ## 📌 Vue d’ensemble du pipeline
 
-![Diagramme complet du pipeline](screenshots/Capture d'écran 2025-04-08 155448.png)
+Diagramme complet du pipeline ![Capture d'écran 2025-04-08 155448](https://github.com/user-attachments/assets/bd7ecd4d-3ce6-4f9a-b97f-79a3d9e62577)
+
 
 Ce diagramme illustre l’architecture globale du pipeline :
 - Source : Blob Storage contenant `Cars.csv`
